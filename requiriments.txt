@@ -1,3 +1,6 @@
 FastAPI 
 sqlalchemy[asyncio]
 aiosqlite
+python-decouple
+python-dotenv
+pipe

@@ -1,4 +1,4 @@
-from track import Track
+from src.domain.models.track import Track
 from typing import List
 
 

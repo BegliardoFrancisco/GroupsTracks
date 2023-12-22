@@ -34,7 +34,4 @@ class TrackRepository(ABCMeta):
         raise NotImplementedError('NotImplementedError: '
                                   f'et_tracks_from_album method in {__class__}')
 
-    @abstractmethod
-    def get_tracks_from_playlist(cls, playlist_id: int) -> List[Track]:
-        raise NotImplementedError('NotImplementedError: '
-                                  f'get_tracks_from_playlist method in {__class__}')
+

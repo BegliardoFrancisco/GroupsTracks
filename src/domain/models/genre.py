@@ -1,4 +1,7 @@
-class Genres:
-    def __int__(self, id, name) -> None:
-        self.id:    int = id
-        self.name:  str = name
+class Genre:
+    name: str
+    id: int
+
+    def __init__(self, id: int, name: str):
+        self.id = id
+        self.name = name

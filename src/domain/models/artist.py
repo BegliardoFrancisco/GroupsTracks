@@ -1,4 +1,4 @@
-from album import Album
+from src.domain.models.album import Album
 from typing import List
 
 

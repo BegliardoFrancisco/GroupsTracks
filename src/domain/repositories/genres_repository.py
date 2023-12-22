@@ -1,31 +1,27 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import List
-from src.domain.models.genre import Genres
+from src.domain.models.genre import Genre
 
 
-class GenresRepositories(ABCMeta):
+class GenreRepositories(ABC):
 
     @abstractmethod
-    def get_all_genres(cls) -> List[Genres]:
+    def get_all_genres(self) -> List[Genre]:
         raise NotImplementedError(f"NotImplementedError: "
                                   f"get_all_genres no implemented method in class: {__class__}")
 
     @abstractmethod
-    def get_genres_id(cls, id: int) -> Genres:
+    def get_genres_id(self, id: int) -> Genre:
         raise NotImplementedError(f"NotImplementedError: "
                                   f"get_genres_id no implemented method in class: {__class__}")
 
     @abstractmethod
-    def add_genres(cls, genres: Genres) -> None:
+    def add_genres(self, genres: Genre) -> None:
         raise NotImplementedError(f"NotImplementedError: "
                                   f"add_genres no implemented method in class: {__class__}")
 
     @abstractmethod
-    def delete_genres(cls, genres: Genres) -> None:
+    def delete_genres(self, genres: Genre) -> None:
         raise NotImplementedError('NotImplementedError: '
                                   f'delete_genres method in {__class__}')
 
-    @abstractmethod
-    def update_genres(cls, genres: Genres) -> None:
-        raise NotImplementedError('NotImplementedError: '
-                                  f'update_genres method in {__class__}')

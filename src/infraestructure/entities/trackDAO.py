@@ -2,6 +2,7 @@ from src.infraestructure.entities.base import Base
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import ForeignKey
+from src.domain.models.track import Track
 
 
 class TrackDAO(Base):
@@ -15,4 +16,8 @@ class TrackDAO(Base):
     AlbumId: Mapped[int] = mapped_column(ForeignKey("albums.AlbumId"))
     MediaTypeId: Mapped[int] = mapped_column(ForeignKey("media_types.MediaTypeId"))
     GenreId: Mapped[int] = mapped_column(ForeignKey("genres.GenresId"))
-    
+
+
+    def fromtrack(self,):
+        return Track(self.TrackId,self.Name, self.Composer,self.Milliseconds, self.Bytes,self.UnitPrice)
+
