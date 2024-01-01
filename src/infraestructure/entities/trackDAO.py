@@ -18,6 +18,5 @@ class TrackDAO(Base):
     GenreId: Mapped[int] = mapped_column(ForeignKey("genres.GenresId"))
 
 
-    def fromtrack(self,):
-        return Track(self.TrackId,self.Name, self.Composer,self.Milliseconds, self.Bytes,self.UnitPrice)
+
 

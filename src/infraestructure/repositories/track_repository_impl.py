@@ -13,17 +13,17 @@ class TrackRepositoryImpl(TrackRepository):
     async def get_all_tracks(self) -> List[Track]:
         pass
 
-    def get_track_by_id(self, id: int) -> Track:
+    async def get_track_by_id(self, id: int) -> Track:
         pass
 
-    def add_track(self, track: Track) -> None:
+    async def add_track(self, track: Track) -> None:
         pass
 
-    def delete_track(self, track: Track) -> None:
+    async def delete_track(self, track: Track) -> None:
         pass
 
-    def update_track(self, track: Track) -> None:
+    async def update_track(self, track: Track) -> None:
         pass
 
-    def get_tracks_from_album(self, album_id: int) -> List[Track]:
+    async def get_tracks_from_album(self, album_id: int) -> List[Track]:
         pass

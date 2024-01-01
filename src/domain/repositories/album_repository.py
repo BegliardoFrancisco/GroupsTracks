@@ -1,36 +1,41 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import List
 from src.domain.models.album import Album
 
 
-class AlbumRepositories(ABCMeta):
+class AlbumRepositories(ABC):
 
     @abstractmethod
-    def get_all_album(cls) -> List[Album]:
+    async def get_all_album(self) -> List[Album]:
         raise NotImplementedError(f"NotImplementedError: "
                                   f"get_all_album no implemented method in class: {__class__}")
 
     @abstractmethod
-    def get_albums_from_artist(cls, artist_id: int) -> List[Album]:
+    async def get_albums_from_artist(self, artist_id: int) -> List[Album]:
         raise NotImplementedError(f"NotImplementedError: "
                                   f"get_all_album no implemented method in class: {__class__}")
 
     @abstractmethod
-    def get_album_id(cls, id: int) -> Album:
+    async def get_album_id(self, id: int) -> Album:
         raise NotImplementedError(f"NotImplementedError: "
                                   f"get_album_id no implemented method in class: {__class__}")
 
     @abstractmethod
-    def add_album(cls, album: Album) -> None:
+    async def add_album(self, album: Album, artist_id: int) -> None:
         raise NotImplementedError(f"NotImplementedError: "
                                   f"add_album no implemented method in class: {__class__}")
     
     @abstractmethod
-    def delete_album(cls, album: Album) -> None:
+    async def delete_album(self, album_id: int) -> None:
         raise NotImplementedError('NotImplementedError: '
                                   f'delete_album method in {__class__}')
 
     @abstractmethod
-    def update_album(cls, album: Album) -> None:
+    async def update_album(self, album: Album, album_id: int) -> None:
+        raise NotImplementedError('NotImplementedError: '
+                                  f'update_album method in {__class__}')
+
+    @abstractmethod
+    async def get_artist_id_from_album(self, album: Album) -> int:
         raise NotImplementedError('NotImplementedError: '
                                   f'update_album method in {__class__}')

@@ -2,13 +2,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 from typing import List
 
-from src.domain.models.artist import Artist
+from src.domain.models.album import Album
+from src.domain.models.media_type import MediaType
 from src.infraestructure.repositories import engine
 from src.infraestructure.entities.trackDAO import TrackDAO
 from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
-from src.infraestructure.repositories.artist_repository_impl import ArtistRepositoryImpl
-
+from src.infraestructure.repositories.media_type_repository_impl import MediaTypeRepositoryImpl
 
 async def conn_bdd():
     async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
@@ -24,27 +24,22 @@ async def conn_bdd():
             print("{" + f' id: {a.TrackId},\n  artist: {a.Milliseconds},\n  album: {a.AlbumId},\n' + '}')
 
 
-genre = ArtistRepositoryImpl()
+genre = MediaTypeRepositoryImpl()
 
 
 async def todo(gen):
-    ges: List[Artist] = await gen.get_all_artist()
+    ges: List[MediaType] = [await gen.get_media_type_id(6)]
     for ge in ges:
-        print('{' + f'name: {ge.name}, id: {ge.id}' + '}')
+        print('{' + f'name: {ge.name}, id: {ge.id} ' + '}')
 
 
-async def printer(gen: ArtistRepositoryImpl):
-    artist = Artist(id=316, name="Francisco", albums=None)
-    await gen.update_artist(artist=artist, id=316)
+async def printer(gen: MediaTypeRepositoryImpl):
+    media = MediaType(6, 'WAV')
+    await gen.update_media_type(media)
 
 
-async def main(gen):
-    print('AFTER')
-    await todo(gen)
-    print('UPDATE')
-    await printer(gen)
-    print('BEFORE')
-    await todo(gen)
 
 
-asyncio.run(main(genre))
+
+
+asyncio.run(todo(genre))

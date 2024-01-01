@@ -1,3 +1,4 @@
+
 from src.domain.models.artist import Artist
 from src.domain.repositories.artist_repository import ArtistRepositories
 from src.infraestructure.entities.artistDAO import ArtistDAO
@@ -11,7 +12,7 @@ from sqlalchemy import select, delete, update
 
 class ArtistRepositoryImpl(ArtistRepositories):
 
-    def __init__(self):
+    def __init__(self,):
         super().__init__()
         self.async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
@@ -93,3 +94,4 @@ class ArtistRepositoryImpl(ArtistRepositories):
                         )
         except Exception as e:
             raise e
+
