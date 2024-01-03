@@ -2,8 +2,16 @@ from abc import ABCMeta, abstractmethod
 from src.domain.models.track import Track
 from typing import List
 
+from src.domain.repositories.genres_repository import GenreRepositories
+from src.domain.repositories.media_type_repository import MediaTypeRepositories
+
 
 class TrackRepository(ABCMeta):
+
+    def __init__(self, media_type_repository: MediaTypeRepositories, genre_repository: GenreRepositories):
+        self.media_type_repository = media_type_repository
+        self.genre_repository = genre_repository
+
     @abstractmethod
     async def get_all_tracks(cls) -> List[Track]:
         raise NotImplementedError(f'NotImplementedError: '
@@ -34,4 +42,7 @@ class TrackRepository(ABCMeta):
         raise NotImplementedError('NotImplementedError: '
                                   f'et_tracks_from_album method in {__class__}')
 
-
+    @abstractmethod
+    async def get_tracks_from_playlist(cls, playlist_id: int) -> List[Track]:
+        raise NotImplementedError('NotImplementedError: '
+                                  f'get_tracks_from_playlist method in {__class__}')

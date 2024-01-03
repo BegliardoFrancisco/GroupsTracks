@@ -25,7 +25,7 @@ class AlbumRepositoryImpl(AlbumRepositories):
                 )
                 return albums
         except Exception as e:
-            print(f"Error en get_all_genres: {str(e)}")
+            print(f"Error en get_all_album: {str(e)}")
             return []
 
     async def get_albums_from_artist(self, artist_id: int) -> List[Album]:
@@ -40,7 +40,7 @@ class AlbumRepositoryImpl(AlbumRepositories):
                 )
                 return albums
         except Exception as e:
-            print(f"Error in get_albums_from_artist: {str(e)}")
+            print(f"Error in get_albums_from_album: {str(e)}")
             raise e
 
     async def get_album_id(self, id: int) -> Album:
@@ -79,7 +79,7 @@ class AlbumRepositoryImpl(AlbumRepositories):
                         .where(AlbumDAO.AlbumId == album_id)
                     )
         except Exception as e:
-            print(f"Error en get_all_artist: {str(e)}")
+            print(f"Error en get_all_album: {str(e)}")
             raise e
 
     async def update_album(self, album: Album, artist_id: int) -> None:
@@ -90,14 +90,14 @@ class AlbumRepositoryImpl(AlbumRepositories):
                     result = await session.execute(
                         select(AlbumDAO).filter(AlbumDAO.AlbumId == album.id)
                     )
-                    artist_from_db = result.scalar()
+                    album_from_db = result.scalar()
 
-                    # Check if artist was found
-                    if not artist_from_db:
+                    # Check if album was found
+                    if not album_from_db:
                         raise ValueError(f"Artist with ID {id} not found")
 
                     # If the object is a SQLAlchemy model, update it using the update() method
-                    if isinstance(artist_from_db, AlbumDAO):
+                    if isinstance(album_from_db, AlbumDAO):
                         await session.execute(
                             update(AlbumDAO)
                             .where(AlbumDAO.AlbumId == album.id)

@@ -23,8 +23,10 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
                 mediatypes = list(
                     await session.execute(query)  # List[Tuple]
                     | Pipe(lambda execute: execute.scalars().all())  # List[MediaTypeDAO]
-                    | Pipe(map(lambda media_type: MediaType(media_type.MediaTypeId, media_type.Name))) # List[MediaType]
+                    | Pipe(map(lambda media_type: MediaType(media_type.MediaTypeId, media_type.Name)))
+                    # List[MediaType]
                 )
+
                 return mediatypes
         except Exception as e:
             print(f"Error en get_all_genres: {str(e)}")
@@ -32,12 +34,14 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
 
     async def get_media_type_id(self, id: int) -> MediaType:
         try:
+
             async with self.async_session() as session:
                 query = select(MediaTypeDAO).where(MediaTypeDAO.MediaTypeId == id)
                 mediatypes = list(
                     await session.execute(query)  # List[Tuple]
                     | Pipe(lambda execute: execute.scalars().all())  # List[MediaTypeDAO]
-                    | Pipe(map(lambda media_type: MediaType(media_type.MediaTypeId, media_type.Name))) # List[MediaType]
+                    | Pipe(map(lambda media_type: MediaType(media_type.MediaTypeId, media_type.Name)))
+                    # List[MediaType]
                 )
                 return mediatypes[0]
         except Exception as e:
@@ -96,10 +100,11 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
     async def get_media_type_from_track(self, track_id: int) -> MediaType:
         try:
             async with self.async_session() as session:
-                query = select(MediaTypeDAO).join(TrackDAO, TrackDAO.MediaTypeId == MediaTypeDAO.MediaTypeId).where(TrackDAO.TrackId == track_id)
+                query = select(MediaTypeDAO).join(TrackDAO, TrackDAO.MediaTypeId == MediaTypeDAO.MediaTypeId).where(
+                    TrackDAO.TrackId == track_id)
                 mediatype = await session.execute(query)  # List[Tuple]
-                mediatype: MediaTypeDAO = mediatype.scalars().all()# MediaTypeDAO
-                result: MediaType = MediaType(mediatype[0].MediaTypeId, mediatype[0].Name) # List[MediaType]
+                mediatype: MediaTypeDAO = mediatype.scalars().all()  # MediaTypeDAO
+                result: MediaType = MediaType(mediatype[0].MediaTypeId, mediatype[0].Name)  # List[MediaType]
 
                 return result
         except Exception as e:
