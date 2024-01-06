@@ -1,14 +1,16 @@
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 from typing import List
+from src.infraestructure.repositories.track_repository_impl import TrackRepositoryImpl
 from src.infraestructure.repositories.genre_repository_impl import GenreRepositoryImpl
-from src.domain.models.play_list import PlayList
+from src.infraestructure.repositories.media_type_repository_impl import MediaTypeRepositoryImpl
+from src.domain.models.track import Track
 from src.domain.models.media_type import MediaType
 from src.infraestructure.repositories import engine
 from src.infraestructure.entities.trackDAO import TrackDAO
 from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
-from src.infraestructure.repositories.media_type_repository_impl import MediaTypeRepositoryImpl
+
 
 
 
@@ -22,21 +24,18 @@ async def conn_bdd():
         )
         result: List[TrackDAO] = execute.scalars().all()
 
-        for a in result:
-            print("{" + f' id: {a.TrackId},\n  artist: {a.Milliseconds},\n  album: {a.AlbumId},\n' + '}')
-
-
-genre = GenreRepositoryImpl()
+mt = MediaTypeRepositoryImpl()
+g = GenreRepositoryImpl()
+genre = TrackRepositoryImpl(mt,g)
 
 
 async def todo(gen):
-    ges: List[PlayList] = await gen.get_all_genres()
+    ges: List[Track] = [await gen.get_track_by_id(1)]
     for ge in ges:
-        tracks = [f'{t.name}' for t in ge.tracks]
         print('{' + f'name: {ge.name}, id: {ge.id} ' + '}')
 
 
-async def printer(gen: MediaTypeRepositoryImpl):
+async def printer(gen: TrackRepositoryImpl):
     media = MediaType(6, 'WAV')
     await gen.update_media_type(media)
 

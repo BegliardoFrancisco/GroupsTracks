@@ -14,15 +14,9 @@ class GenreRepositoryImpl(GenreRepositories):
     def __init__(self):
         super().__init__()
         self.async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
-        self.caching_genres: List[Genre]| None = None
-
+    
     async def get_all_genres(self) -> List[Genre]:
-
         try:
-            if (self.caching_genres is not None
-                    and isinstance(self.caching_genres, List)
-                    and len(self.caching_genres) != 0):
-                return self.caching_genres
             async with self.async_session() as session:
                 query = select(GenresDAO)
                 genres = list(
@@ -37,16 +31,6 @@ class GenreRepositoryImpl(GenreRepositories):
 
     async def get_genres_id(self, id: int) -> Genre:
         try:
-            if (self.caching_genres is not None
-                    and isinstance(self.caching_genres, List)
-                    and len(self.caching_genres) != 0):
-                media = list(filter(lambda m: m.id == id, self.caching_genres))
-                return media[0]
-
-            elif (self.caching_genres is None
-                  or len(self.caching_genres) == 0):
-                await self.get_all_genres()
-
             async with self.async_session() as session:
                 query = select(GenresDAO).where(GenresDAO.GenreId == id)
                 genre = list(
@@ -77,7 +61,6 @@ class GenreRepositoryImpl(GenreRepositories):
                     session.execute(
                         delete(GenresDAO).where(GenresDAO.GenreId == genres.id)
                     )
-                self.caching_genres.remove(genres)
 
         except Exception as e:
             print(f"Error en get_all_genres: {str(e)}")
