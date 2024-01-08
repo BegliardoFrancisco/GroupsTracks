@@ -4,10 +4,12 @@ from typing import List
 from src.infraestructure.repositories.track_repository_impl import TrackRepositoryImpl
 from src.infraestructure.repositories.genre_repository_impl import GenreRepositoryImpl
 from src.infraestructure.repositories.media_type_repository_impl import MediaTypeRepositoryImpl
+from src.infraestructure.repositories.playlist_repository_impl import PlayListRepositoryImpl
 from src.domain.models.track import Track
 from src.domain.models.media_type import MediaType
 from src.infraestructure.repositories import engine
 from src.infraestructure.entities.trackDAO import TrackDAO
+from src.domain.models.play_list import PlayList
 from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
 
@@ -26,13 +28,16 @@ async def conn_bdd():
 
 mt = MediaTypeRepositoryImpl()
 g = GenreRepositoryImpl()
-genre = TrackRepositoryImpl(mt,g)
+t = TrackRepositoryImpl(mt,g)
+
+genre = PlayListRepositoryImpl(g, mt)
 
 
 async def todo(gen):
-    ges: List[Track] = [await gen.get_track_by_id(1)]
+    ges: List[PlayList] = await gen.get_all_playlist()
     for ge in ges:
-        print('{' + f'name: {ge.name}, id: {ge.id} ' + '}')
+        tracks = [f'Name: {t.name}' for t in gen.tracks ]
+        print('{' + f'name: {ge.name}, id: {ge.id} , tracks: {tracks} ' + '}')
 
 
 async def printer(gen: TrackRepositoryImpl):

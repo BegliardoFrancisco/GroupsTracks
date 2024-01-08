@@ -29,7 +29,7 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
 
                 return mediatypes
         except Exception as e:
-            print(f"Error en get_all_genres: {str(e)}")
+            print(f"Error in get_all_media_type: {str(e)}")
             return []
 
     async def get_media_type_id(self, id: int) -> MediaType:
@@ -45,7 +45,7 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
                 )
                 return mediatypes[0]
         except Exception as e:
-            print(f"Error en get_all_genres: {str(e)}")
+            print(f"Error in get_media_type_id: {str(e)}")
             raise e
 
     async def add_media_type(self, media_type: MediaType) -> None:
@@ -56,7 +56,7 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
                         MediaTypeDAO(MediaTypeId=media_type.id, Name=media_type.name)
                     ])
         except Exception as e:
-            print(f"Error en get_all_genres: {str(e)}")
+            print(f"Error in add_media_type: {str(e)}")
             raise e
 
     async def delete_media_type(self, media_type: MediaType) -> None:
@@ -67,7 +67,7 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
                         delete(MediaTypeDAO).where(MediaTypeDAO.MediaTypeId == media_type.id)
                     )
         except Exception as e:
-            print(f"Error en get_all_genres: {str(e)}")
+            print(f"Error in delete_media_type: {str(e)}")
             raise e
 
     async def update_media_type(self, media_type: MediaType) -> None:
@@ -82,7 +82,7 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
 
                     # Check if artist was found
                     if not media_type_from_db:
-                        raise ValueError(f"Artist with ID {id} not found")
+                        raise ValueError(f"MediaType with ID {id} not found")
 
                     # If the object is a SQLAlchemy model, update it using the update() method
                     if isinstance(media_type_from_db, MediaTypeDAO):
@@ -108,5 +108,5 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
 
                 return result
         except Exception as e:
-            print(f"Error en get_all_genres: {str(e)}")
+            print(f"Error in get_media_type_from_track: {str(e)}")
             raise e

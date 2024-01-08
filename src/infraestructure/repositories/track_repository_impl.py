@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..repositories import engine
 from sqlalchemy import select, delete, update
 from pipe import Pipe, map
-
+from src.infraestructure.entities.playlist_trackDAO import PlayList_TrackDAO
 
 class TrackRepositoryImpl(TrackRepository):
 
@@ -93,7 +93,36 @@ class TrackRepositoryImpl(TrackRepository):
             raise e
 
     async def update_track(self, track: Track) -> None:
-        pass
+        try:
+            async with self.async_session() as session:
+                async with session.begin():
+                    # Fetch the specific track object using fetchone
+                    result = await session.execute(
+                        select(TrackDAO).filter(TrackDAO.TrackId == track.id)
+                    )
+                    media_type_from_db = result.scalar()
+
+                    # Check if track was found
+                    if not media_type_from_db:
+                        raise ValueError(f"Track with ID {id} not found")
+
+                    # If the object is a SQLAlchemy model, update it using the update() method
+                    if isinstance(media_type_from_db, TrackDAO):
+                        await session.execute(
+                            update(TrackDAO)
+                            .where(TrackDAO.TrackId == track.id)
+                            .values({
+                                    TrackDAO.TrackId: track.id,
+                                    TrackDAO.Name: track.name,
+                                    TrackDAO.Composer: track.composer,
+                                    TrackDAO.Milliseconds: track.miliseconds,
+                                    TrackDAO.Bytes: track.bytes,
+                                    TrackDAO.UnitPrice: track.unitprice,
+                                    TrackDAO.GenreId: track.genre.id,
+                                    TrackDAO.MediaTypeId: track.mediatype.id
+                        }))
+        except Exception as e:
+            raise e
 
     async def get_tracks_from_album(self, album_id: int) -> List[Track]:
         try:
@@ -117,3 +146,30 @@ class TrackRepositoryImpl(TrackRepository):
         except Exception as e:
             print(f"Error in get_tracks_from_album: {str(e)}")
             return []   
+        
+    async def get_tracks_from_playlist(self, playlist_id: int) -> List[Track]:
+        try:
+            async with self.async_session() as session:
+                query = (
+                        select(TrackDAO)
+                        .join(PlayList_TrackDAO,PlayList_TrackDAO.TrackId == TrackDAO.TrackId)
+                        .where(PlayList_TrackDAO.PlaylistId== playlist_id)
+                        )
+                genres = {f'{g.id}': g for g in (await self.genre_repository.get_all_genres())}
+                media = {f'{m.id}': m for m in (await self.media_type_repository.get_all_media_type())}
+                tracks_album = list(
+                    await session.execute(query)  # List[Tuple]
+                    | Pipe(lambda execute: execute.scalars().all())  # List[TrackDAO]
+                    | Pipe(map(lambda t: Track( t.TrackId,
+                                                t.Name,
+                                                t.Composer,
+                                                t.Milliseconds,
+                                                t.Bytes,
+                                                t.UnitPrice,
+                                                genres[f'{t.GenreId}'],
+                                                media[f'{t.MediaTypeId}'])))  # List[Track]
+                )
+                return tracks_album
+        except Exception as e:
+            print(f"Error in get_tracks_from_playlist: {str(e)}")
+            return []        

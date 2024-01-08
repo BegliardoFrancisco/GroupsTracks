@@ -1,13 +1,17 @@
 from abc import ABC, abstractmethod
 from typing import List
+from src.domain.repositories.genres_repository import GenreRepositories
+from src.domain.repositories.media_type_repository import MediaTypeRepositories
 from src.domain.models.play_list import PlayList
-from src.domain.repositories.playlist_track_repository import TracksInPlaylistRepository
+from src.domain.repositories.track_repository import TrackRepository
 
 
 class PlayListRepositories(ABC):
 
-    def __init__(self, track_playlist_repository: TracksInPlaylistRepository):
-        self.track_playlist_repository: TracksInPlaylistRepository = track_playlist_repository
+    def __init__(self,genre_repository: GenreRepositories , media_type_repository: MediaTypeRepositories):
+
+        self.genre_repository: GenreRepositories = genre_repository
+        self.media_type_repository: MediaTypeRepositories = media_type_repository
 
     @abstractmethod
     async def get_all_playlist(cls) -> List[PlayList]:
