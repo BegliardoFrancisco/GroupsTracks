@@ -85,7 +85,7 @@ class TrackRepositoryImpl(TrackRepository):
         try:
             async with self.async_session() as session:
                 async with session.begin():
-                    session.execute(
+                   await session.execute(
                         delete(TrackDAO).where(TrackDAO.GenreId == track.id)
                     )
         except Exception as e:
@@ -155,9 +155,11 @@ class TrackRepositoryImpl(TrackRepository):
                         .join(PlayList_TrackDAO,PlayList_TrackDAO.TrackId == TrackDAO.TrackId)
                         .where(PlayList_TrackDAO.PlaylistId== playlist_id)
                         )
+                
                 genres = {f'{g.id}': g for g in (await self.genre_repository.get_all_genres())}
                 media = {f'{m.id}': m for m in (await self.media_type_repository.get_all_media_type())}
-                tracks_album = list(
+                
+                tracks_pl: List[Track] = list(
                     await session.execute(query)  # List[Tuple]
                     | Pipe(lambda execute: execute.scalars().all())  # List[TrackDAO]
                     | Pipe(map(lambda t: Track( t.TrackId,
@@ -169,7 +171,26 @@ class TrackRepositoryImpl(TrackRepository):
                                                 genres[f'{t.GenreId}'],
                                                 media[f'{t.MediaTypeId}'])))  # List[Track]
                 )
-                return tracks_album
+                return tracks_pl
         except Exception as e:
             print(f"Error in get_tracks_from_playlist: {str(e)}")
-            return []        
+            return []
+        
+    async def check_exist_tracks(self, tracks_ids: List[int]) -> bool:
+        try:
+            async with self.async_session() as session:
+                query = select(TrackDAO).where(TrackDAO.TrackId in tracks_ids)
+                tracks = list(
+                    await session.execute(query)  # List[Tuple]
+                    | Pipe(lambda execute: execute.scalars().all())  # List[TrackDAO]
+                )
+                
+                if len(tracks_ids) == len(tracks):   return True
+                elif len(tracks_ids) != len(tracks): return False
+                elif not tracks: return False
+                else: return False
+        
+        except Exception as e:
+            print(f"Error en get_all_album: {str(e)}")
+            raise e 
+            

@@ -27,4 +27,5 @@ class Customer:
         if isinstance(invoice, Invoice):
             self.invoices.append(invoice)
         else:
-            raise TypeError(f"the invoice argument no is type Invoice class:{__class__} in {__name__} {__file__}")
+            raise TypeError(f"the invoice argument no is type Invoice is type:{type(invoice)}"
+                           + f"class:{__class__} in {__name__} {__file__}")

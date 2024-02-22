@@ -21,11 +21,11 @@ class ArtistRepositories(ABC):
                                   f"add_artist no implemented method in class: {__class__}")
 
     @abstractmethod
-    async def delete_artist(cls, artist: Artist) -> None:
+    async def delete_artist(cls, artist_id: int) -> None:
         raise NotImplementedError('NotImplementedError: '
                                   f'delete_artist method in {__class__}')
 
     @abstractmethod
-    async def update_artist(cls, artist: Artist, id: int) -> None:
+    async def update_artist(cls, artist: Artist) -> None:
         raise NotImplementedError('NotImplementedError: '
                                   f'update_artist method in {__class__}')

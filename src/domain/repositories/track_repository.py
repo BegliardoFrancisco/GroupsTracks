@@ -43,6 +43,11 @@ class TrackRepository(ABC):
                                   f'et_tracks_from_album method in {__class__}')
 
     @abstractmethod
-    async def get_tracks_from_playlist(cls, album_id: int) -> List[Track]:
+    async def get_tracks_from_playlist(cls, playlist_id: int) -> List[Track]:
         raise NotImplementedError('NotImplementedError: '
                                   f'et_tracks_from_playlist method in {__class__}')
+
+    @abstractmethod
+    async def check_exist_tracks(cls, tracks_ids: List[int]) -> bool:
+        raise NotImplementedError('NotImplementedError: '
+                                  f'check_exist_tracks method in {__class__}')

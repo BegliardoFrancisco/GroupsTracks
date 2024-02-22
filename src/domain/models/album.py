@@ -15,7 +15,7 @@ class Album:
         if isinstance(track, Track):
             self.tracks.append(track)
         else:
-            raise TypeError(f"the track argument no is type Track class:{__class__} in {__name__} {__file__}")
+            raise TypeError(f"The track argument not is type Track is type:{type(track)} class:{__class__} in {__name__} {__file__}")
 
     async def add_tracks(self, tracks: List[Track]):
 

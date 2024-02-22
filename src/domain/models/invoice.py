@@ -22,13 +22,14 @@ class Invoice:
         Checking type for item and added in self.items: List
         :returns
             :typeError is item not type
-            :None item type & added
+            :None added invoice item in props items 
 
         """
         if isinstance(item, InvoiceItems):
             self.items.append(item)
         else:
-            raise TypeError(f"the item argument no is type InvoiceItems  class:{__class__} in {__name__} {__file__}")
+            raise TypeError(f"the item argument not is type InvoiceItems, it is type {type(item)}"
+                            +  f"class:{__class__} in {__name__} {__file__}")
 
     async def calculate_total_price(self) -> int:
         """
@@ -46,4 +47,5 @@ class Invoice:
         if isinstance(price, int):
             self.price_total = price
         else:
-            raise TypeError(f"the price argument no is type int  class:{__class__} in {__name__} {__file__}")
+            raise TypeError(f"the price argument no is type int, it is type {type(price)}" + 
+                            "class:{__class__} in {__name__} {__file__}")
