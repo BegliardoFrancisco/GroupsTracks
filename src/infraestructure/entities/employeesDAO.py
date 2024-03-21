@@ -5,7 +5,7 @@ from sqlalchemy import ForeignKey
 from datetime import datetime
 
 
-class EmployeesDAO(Base):
+class EmployesDAO(Base):
 
     ___tablename__ = "employees"
     EmployeeId: Mapped[int] = mapped_column(primary_key=True)

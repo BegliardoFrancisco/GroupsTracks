@@ -19,13 +19,13 @@ class AlbumRepositoryImpl(AlbumRepositories):
             async with self.async_session() as session:
                 query = select(AlbumDAO)
                 albums = list(
-                await session.execute(query)  # List[Tuple]
+                    await session.execute(query)  # List[Tuple]
                     | Pipe(lambda execute: execute.scalars().all())  # List[AlbumDAO]
                     | Pipe(map(lambda abm: Album(abm.AlbumId, abm.title, None)))  # List[Album]
                 )
                 if not albums | albums == []:
-                   raise ConnectionError(f"I don't know i can perform the search or this has not returned results")
-             
+                    raise ConnectionError(f"I don't know i can perform the search or this has not returned results")
+
                 return albums
         except Exception as e:
             print(f"Error in get_all_album: {e}")
@@ -33,10 +33,10 @@ class AlbumRepositoryImpl(AlbumRepositories):
 
     async def get_albums_from_artist(self, artist_id: int) -> List[Album]:
         try:
-            
+
             if not isinstance(artist_id, int) or not isinstance(artist_id, int):
                 raise AttributeError(f"artist_id no is instance of int or float type")
-            
+
             async with self.async_session() as session:
                 query = select(AlbumDAO).where(AlbumDAO.ArtistId == artist_id)
                 albums: List[Album] = list(
@@ -44,27 +44,28 @@ class AlbumRepositoryImpl(AlbumRepositories):
                     | Pipe(lambda execute: execute.scalars().all())  # List[AlbumDAO]
                     | Pipe(map(lambda a: Album(a.AlbumId, a.title, None)))  # List[Album]
                 )
-                if not albums: 
+                if not albums:
                     raise ValueError(f"The ID from artist provided does not correspond to any record")
-                return albums  
+                return albums
         except Exception as e:
             print(f"Error in get_albums_from_album: {e}")
             raise e
 
-    async def get_album_id(self, id: int) -> Album:
+    async def get_album_id(self, album_id: int) -> Album:
         try:
-            if not isinstance(id, int) or not isinstance(id, int):
+            if not isinstance(album_id, int) or not isinstance(album_id, int):
                 raise AttributeError(f"artist_id no is instance of int or float type")
-            
+
             async with self.async_session() as session:
-                query = select(AlbumDAO).where(AlbumDAO.AlbumId == id)
+                query = select(AlbumDAO).where(AlbumDAO.AlbumId == album_id)
                 albums: List[Album] = list(
                     await session.execute(query)  # List[Tuple]
                     | Pipe(lambda execute: execute.scalars().all())  # List[AlbumDAO]
                     | Pipe(map(lambda a: Album(a.AlbumId, a.title, None)))  # List[Album]
                 )
-                if not albums: 
+                if not albums:
                     raise ValueError(f"The ID from album provided does not correspond to any record")
+
                 return albums[0]
         except Exception as e:
             print(f"Error in get_album_id: {e}")
@@ -74,16 +75,16 @@ class AlbumRepositoryImpl(AlbumRepositories):
         try:
             if not isinstance(artist_id, int) or not isinstance(artist_id, int):
                 raise AttributeError(f"artist_id no is instance of int or float type")
-            
+
             if not isinstance(album, Album) or not isinstance(album, Album):
                 raise AttributeError(f"thee album prop in metdhos not is type Album")
-            
+
             async with self.async_session() as session:
                 async with session.begin():
                     session.add_all([
                         AlbumDAO(AlbumId=album.id, title=album.title, ArtistId=artist_id)
                     ])
-                    
+
         except Exception as e:
             print(f"Error in add_album: {str(e)}")
             raise e

@@ -47,6 +47,7 @@ class ArtistRepositoryImpl(ArtistRepositories):
                 )
                 if not artists:
                     raise ValueError(f" I don't know if I found any artist with the ID provided")
+
                 return artists[0]
         except Exception as e:
             print(f"Error in get_artist_id: {e}")
@@ -112,4 +113,3 @@ class ArtistRepositoryImpl(ArtistRepositories):
                         )
         except Exception as e:
             raise e
-
