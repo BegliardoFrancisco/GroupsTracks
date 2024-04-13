@@ -6,7 +6,8 @@ import asyncio
 
 class Invoice:
 
-    def __init__(self, id, date, address, city, state, country, postalcode, items: List[InvoiceItems]):
+    def __init__(self, id, date, address, city,
+                 state, country, postalcode, price_total: int, items: List[InvoiceItems]):
         self.id: int = id
         self.date: datetime = date
         self.address: str = address
@@ -14,7 +15,7 @@ class Invoice:
         self.state: str = state
         self.country: str = country
         self.postalCode: int = postalcode
-        self.price_total: float = 0
+        self.price_total: float = price_total
         self.items: List[InvoiceItems] = items
 
     async def add_item(self, item: InvoiceItems) -> None:
@@ -29,7 +30,7 @@ class Invoice:
             self.items.append(item)
         else:
             raise TypeError(f"the item argument not is type InvoiceItems, it is type {type(item)}"
-                            +  f"class:{__class__} in {__name__} {__file__}")
+                            + f"class:{__class__} in {__name__} {__file__}")
 
     async def calculate_total_price(self) -> int:
         """

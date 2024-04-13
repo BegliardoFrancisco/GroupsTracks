@@ -12,3 +12,4 @@ class InvoiceItemsDAO(Base):
     UnitPrice: Mapped[int]
     Quantity: Mapped[int]
 
+

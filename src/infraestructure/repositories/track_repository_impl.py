@@ -26,7 +26,7 @@ class TrackRepositoryImpl(TrackRepository):
                 tracks = list(
                     await session.execute(query)  # List[Tuple]
                     | Pipe(lambda execute: execute.scalars().all())  # List[TrackDAO]
-                    | Pipe(map(lambda t: Track( t.TrackId,
+                    | Pipe(map(lambda t: Track(t.TrackId,
                                                 t.Name,
                                                 t.Composer,
                                                 t.Milliseconds,
@@ -72,7 +72,7 @@ class TrackRepositoryImpl(TrackRepository):
                                                 Name=track.name,
                                                 Composer=track.composer,
                                                 Milliseconds=track.miliseconds,
-                                                Bytes=track.quanty_bytes,
+                                                Bytes=track.bytes,
                                                 UnitPrice=track.unitprice,
                                                 GenreId=track.genre.id,
                                                 MediaTypeId=track.mediatype.id)

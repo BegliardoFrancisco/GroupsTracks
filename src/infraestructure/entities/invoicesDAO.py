@@ -10,7 +10,7 @@ class InvoicesDAO(Base):
     __tablename__ = "invoices"
     InvoiceId: Mapped[int] = mapped_column(primary_key=True)
     CustomerId: Mapped[int] = mapped_column(ForeignKey("customers.CustomerId"))
-    InvoicesId: Mapped[datetime]
+    InvoiceDate: Mapped[datetime]
     BillingAddress: Mapped[str]
     BillingCity: Mapped[str]
     BillingState: Mapped[str]

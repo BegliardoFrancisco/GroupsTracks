@@ -1,10 +1,12 @@
 from src.domain.models.employed import Employed
+from src.domain.models.customer import Customer
 from src.infraestructure.entities.employeesDAO import EmployesDAO
 from src.domain.repositories.employed_repository import EmployedRepositories
 from typing import List, Optional
 from sqlalchemy import select, delete, update
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.domain.repositories.customers_repository import CustomerRepositories
 from src.infraestructure.repositories import engine
 from pipe import Pipe
 from datetime import datetime
@@ -12,9 +14,10 @@ from datetime import datetime
 
 class CustomersRepositoryImpl(EmployedRepositories):
 
-    def __init__(self) -> None:
+    def __init__(self, customer_repository: CustomerRepositories) -> None:
         super().__init__()
         self.async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+        self.customer_repository = customer_repository
 
     async def get_all_employed(self, ) -> List[Employed]:
         try:
@@ -31,6 +34,7 @@ class CustomersRepositoryImpl(EmployedRepositories):
                 employees_domain: List[Employed]
                 for employed in employees:
                     leader = await self.get_employed_by_id(employed.ReportsTo)
+                    customers = await self.customer_repository.get_customers_by_employed(employed.id)
                     employees_domain.append(await self.employed_parser(
                         employed.EmployeeId,
                         employed.LastName,
@@ -46,7 +50,8 @@ class CustomersRepositoryImpl(EmployedRepositories):
                         employed.Phone,
                         employed.Fax,
                         employed.Email,
-                        leader))
+                        leader,
+                        customers))
 
                 return employees_domain
         except Exception as e:
@@ -71,6 +76,7 @@ class CustomersRepositoryImpl(EmployedRepositories):
                 employee_domain: Employed
                 for employed in employees:
                     leader = await self.get_employed_by_id(employed.ReportsTo)
+                    customers = await self.customer_repository.get_customers_by_employed(employed.id)
                     employees_domain = await self.employed_parser(
                         employed.EmployeeId,
                         employed.LastName,
@@ -86,7 +92,8 @@ class CustomersRepositoryImpl(EmployedRepositories):
                         employed.Phone,
                         employed.Fax,
                         employed.Email,
-                        leader)
+                        leader,
+                        customers)
 
                 return employees_domain
 
@@ -181,6 +188,6 @@ class CustomersRepositoryImpl(EmployedRepositories):
     async def employed_parser(employed_id: int, last_name: str, first_name: str, title: str,
                               birth_date: datetime, hire_date: datetime, address: str, city: str, state: str,
                               country: str, postal_code: str, phone: str, fax: str, email: str,
-                              leader: Optional['Employed']):
+                              leader: Optional['Employed'], customers: List[Customer]):
         return Employed(employed_id, last_name, first_name, title, birth_date, hire_date,
-                        address, city, state, country, postal_code, phone, fax, email, leader)
+                        address, city, state, country, postal_code, phone, fax, email, leader, customers)

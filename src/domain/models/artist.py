@@ -18,4 +18,4 @@ class Artist:
     async def add_albums(self, tracks: List[Album]):
 
         add_track_task = [await self.add_album(track) for track in tracks]
-        await asyncio.gather(**add_track_task)
+        await asyncio.gather(*add_track_task)
