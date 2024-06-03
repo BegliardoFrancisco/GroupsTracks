@@ -31,11 +31,7 @@ class AlbumRepositories(ABC):
                                   f'delete_album method in {__class__}')
 
     @abstractmethod
-    async def update_album(self, album: Album, album_id: int) -> None:
+    async def update_album(self, album: Album, artist_id: int) -> None:
         raise NotImplementedError('NotImplementedError: '
                                   f'update_album method in {__class__}')
 
-    @abstractmethod
-    async def get_artist_id_from_album(self, album: Album) -> int:
-        raise NotImplementedError('NotImplementedError: '
-                                  f'update_album method in {__class__}')

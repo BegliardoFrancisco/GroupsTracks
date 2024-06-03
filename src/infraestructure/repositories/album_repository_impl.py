@@ -1,10 +1,12 @@
+import asyncio
+
 from src.domain.models.album import Album
 from src.infraestructure.entities.albumDAO import AlbumDAO
 from src.domain.repositories.album_repository import AlbumRepositories
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.infraestructure.entities.artistDAO import ArtistDAO
 from src.infraestructure.repositories import engine
-from pipe import Pipe, map
 from typing import List
 from sqlalchemy import select, delete, update
 
@@ -18,15 +20,17 @@ class AlbumRepositoryImpl(AlbumRepositories):
         try:
             async with self.async_session() as session:
                 query = select(AlbumDAO)
-                albums = list(
-                    await session.execute(query)  # List[Tuple]
-                    | Pipe(lambda execute: execute.scalars().all())  # List[AlbumDAO]
-                    | Pipe(map(lambda abm: Album(abm.AlbumId, abm.title, None)))  # List[Album]
-                )
-                if not albums | albums == []:
+                albums = (await session.execute(query)).scalars().all()  # List[AlbumDAO]
+
+                if not albums or albums == []:
                     raise ConnectionError(f"I don't know i can perform the search or this has not returned results")
 
-                return albums
+                result: List[Album] = await asyncio.gather(
+                    *[album.from_domain()
+                      for album in albums]
+                )
+
+                return result
         except Exception as e:
             print(f"Error in get_all_album: {e}")
             raise e
@@ -34,55 +38,66 @@ class AlbumRepositoryImpl(AlbumRepositories):
     async def get_albums_from_artist(self, artist_id: int) -> List[Album]:
         try:
 
-            if not isinstance(artist_id, int) or not isinstance(artist_id, int):
-                raise AttributeError(f"artist_id no is instance of int or float type")
+            if not isinstance(artist_id, int):
+                raise AttributeError(f"artist_id {artist_id} no is instance of int")
 
             async with self.async_session() as session:
+
                 query = select(AlbumDAO).where(AlbumDAO.ArtistId == artist_id)
-                albums: List[Album] = list(
-                    await session.execute(query)  # List[Tuple]
-                    | Pipe(lambda execute: execute.scalars().all())  # List[AlbumDAO]
-                    | Pipe(map(lambda a: Album(a.AlbumId, a.title, None)))  # List[Album]
-                )
-                if not albums:
-                    raise ValueError(f"The ID from artist provided does not correspond to any record")
-                return albums
+                check = select(ArtistDAO.ArtistId).where(ArtistDAO.ArtistId == artist_id)
+
+                checking: int = (await session.execute(check)).scalar()
+                if not checking:
+                    raise ValueError(f"The ID {artist_id} from artist provided does not correspond to any record")
+
+                albums: List[AlbumDAO] = (await session.execute(query)).scalars().all()
+
+                if not albums or albums == []:
+                    return []
+
+                result: List[Album] = [
+                    await album.from_domain()
+                    for album in albums]
+
+                return result
+
         except Exception as e:
-            print(f"Error in get_albums_from_album: {e}")
+            print(f"Error in get_albums_from_artist: {e}")
             raise e
 
     async def get_album_id(self, album_id: int) -> Album:
         try:
-            if not isinstance(album_id, int) or not isinstance(album_id, int):
-                raise AttributeError(f"artist_id no is instance of int or float type")
+            if not isinstance(album_id, int):
+                raise AttributeError(f"album_id no is instance of int")
 
             async with self.async_session() as session:
                 query = select(AlbumDAO).where(AlbumDAO.AlbumId == album_id)
-                albums: List[Album] = list(
-                    await session.execute(query)  # List[Tuple]
-                    | Pipe(lambda execute: execute.scalars().all())  # List[AlbumDAO]
-                    | Pipe(map(lambda a: Album(a.AlbumId, a.title, None)))  # List[Album]
-                )
-                if not albums:
+
+                album, *_ = (await session.execute(query)).scalars().all()  # List[AlbumDAO]
+
+                if not album:
                     raise ValueError(f"The ID from album provided does not correspond to any record")
 
-                return albums[0]
+                result: Album = await album.from_domain()
+
+                return result
+
         except Exception as e:
             print(f"Error in get_album_id: {e}")
             raise e
 
     async def add_album(self, album: Album, artist_id: int) -> None:
         try:
-            if not isinstance(artist_id, int) or not isinstance(artist_id, int):
-                raise AttributeError(f"artist_id no is instance of int or float type")
+            if not isinstance(artist_id, int):
+                raise AttributeError(f"artist_id not is instance of int")
 
-            if not isinstance(album, Album) or not isinstance(album, Album):
-                raise AttributeError(f"thee album prop in metdhos not is type Album")
+            if not isinstance(album, Album):
+                raise AttributeError(f"the album prop in method not is type Album")
 
             async with self.async_session() as session:
                 async with session.begin():
                     session.add_all([
-                        AlbumDAO(AlbumId=album.id, title=album.title, ArtistId=artist_id)
+                        await AlbumDAO.from_dto(album, artist_id)
                     ])
 
         except Exception as e:
@@ -126,22 +141,5 @@ class AlbumRepositoryImpl(AlbumRepositories):
                                 AlbumDAO.ArtistId: artist_id
                             })
                         )
-        except Exception as e:
-            raise e
-
-    async def get_artist_id_from_album(self, album: Album) -> int:
-        try:
-            async with self.async_session() as session:
-                query = select(AlbumDAO.ArtistId).where(AlbumDAO.AlbumId == album.id)
-
-                artist_id = (
-                    await session.execute(query)
-                ).scalar()
-
-                if not artist_id:
-                    raise ValueError(f"Album with ID {id} not found")
-
-                return artist_id
-
         except Exception as e:
             raise e

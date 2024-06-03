@@ -11,7 +11,7 @@ class CustomerRepositories(ABC):
                                   + f"get_all_customers is abstract method in {__class__}")
 
     @abstractmethod
-    async def get_customers_by_id(self, ) -> Customer:
+    async def get_customers_by_id(self, id: int) -> Customer:
         raise NotImplementedError(f"Not implemented Error:"
                                   + f"get_customers_by_id is abstract method in {__class__}")
 

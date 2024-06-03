@@ -21,7 +21,7 @@ class GenreRepositories(ABC):
                                   f"add_genres no implemented method in class: {__class__}")
 
     @abstractmethod
-    async def delete_genres(self, genres: Genre) -> None:
+    async def delete_genres(self, id: int) -> None:
         raise NotImplementedError('NotImplementedError: '
                                   f'delete_genres method in {__class__}')
 

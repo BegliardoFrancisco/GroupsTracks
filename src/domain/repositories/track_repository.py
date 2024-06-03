@@ -8,10 +8,6 @@ from src.domain.repositories.media_type_repository import MediaTypeRepositories
 
 class TrackRepository(ABC):
 
-    def __init__(self, media_type_repository: MediaTypeRepositories, genre_repository: GenreRepositories):
-        self.media_type_repository = media_type_repository
-        self.genre_repository = genre_repository
-
     @abstractmethod
     async def get_all_tracks(cls) -> List[Track]:
         raise NotImplementedError(f'NotImplementedError: '
@@ -28,7 +24,7 @@ class TrackRepository(ABC):
                                   f'add_track method in {__class__}')
 
     @abstractmethod
-    async def delete_track(cls, track: Track) -> None:
+    async def delete_track(cls, id: int) -> None:
         raise NotImplementedError('NotImplementedError: '
                                   f'delete_track method in {__class__}')
 

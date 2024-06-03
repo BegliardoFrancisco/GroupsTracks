@@ -7,8 +7,8 @@ import asyncio
 class Employed:
     def __init__(self, id: int, last_name: str, first_name: str, title: str,
                  birthdate: datetime, hiredate: datetime, address: str, city: str, state: str, country: str,
-                 postalcode: str, phone: str, fax: str, email: str, reports_to: Optional['Employed'],
-                 customers: List[Customer]):
+                 postalcode: str, phone: str, fax: str, email: str, reports_to: Optional['Employed'] | None,
+                 customer: List[Customer] | None):
 
         self.id: int = id
         self.lastName: str = last_name
@@ -25,7 +25,7 @@ class Employed:
         self.phone: str = phone
         self.fax: str = fax
         self.email: str = email
-        self.customer: List[Customer] = customers
+        self.customer: List[Customer] = customer
 
     async def set_reports_to(self, leader: Optional['Employed']):
         self.reportsTo = leader
@@ -42,3 +42,15 @@ class Employed:
 
         add_customer_task = [await self.add_customer(customer) for customer in customers]
         await asyncio.gather(*add_customer_task)
+
+    def __str__(self):
+        data = ('{\n' 
+                f'   id: {self.id} \n, lastName: {self.lastName}, \n'
+                f'   first name: {self.firstName},\n'
+                f'   reportTo: {self.reportsTo},\n')
+
+        custom = ''
+        for c in self.customer:
+            custom += f' {c} \n'
+
+        return data + custom + '}'

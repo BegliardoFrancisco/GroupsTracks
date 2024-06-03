@@ -1,3 +1,4 @@
+import asyncio
 from src.domain.models.media_type import MediaType
 from src.domain.repositories.media_type_repository import MediaTypeRepositories
 from src.infraestructure.entities.trackDAO import TrackDAO
@@ -6,7 +7,7 @@ from typing import List
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.infraestructure.repositories import engine
-from pipe import Pipe, map
+from pipe import Pipe
 from sqlalchemy import select, delete, update
 
 
@@ -23,34 +24,34 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
                 mediatypes = list(
                     await session.execute(query)  # List[Tuple]
                     | Pipe(lambda execute: execute.scalars().all())  # List[MediaTypeDAO]
-                    | Pipe(map(lambda media_type: MediaType(media_type.MediaTypeId, media_type.Name)))
-                    # List[MediaType]
                 )
-                if not mediatypes | mediatypes == []:
+                if not mediatypes or mediatypes == []:
                     raise ConnectionError(f"I don't know i can perform the search or this has not returned results")
-                return mediatypes
+
+                result: List[MediaType] = await asyncio.gather(*[mediatype.from_domain() for mediatype in mediatypes])
+
+                return result
+
         except Exception as e:
             print(f"Error in get_all_media_type: {e}")
-            return []
+            raise e
 
     async def get_media_type_id(self, id: int) -> MediaType:
         try:
-            if not isinstance(id,int) or not isinstance(id,float):
+            print(type(id))
+            if not isinstance(id, int) or isinstance(id, float):
                 raise ValueError(f"Parameter ID id not the right type")
-            
+
             async with self.async_session() as session:
                 query = select(MediaTypeDAO).where(MediaTypeDAO.MediaTypeId == id)
-                mediatypes = list(
-                    await session.execute(query)  # List[Tuple]
-                    | Pipe(lambda execute: execute.scalars().all())  # List[MediaTypeDAO]
-                    | Pipe(map(lambda media_type: MediaType(media_type.MediaTypeId, media_type.Name)))
-                    # List[MediaType]
-                )
-                
-                if not mediatypes | mediatypes == []:
-                    raise ValueError(f" I don't know if I found any mediatypes with the ID provided")
-                
-                return mediatypes[0]
+
+                mediatype, *_ = (await session.execute(query)).scalars().all()  # List[MediaTypeDAO]
+
+                if not mediatype:
+                    raise ValueError(f" I don't know if I found any mediatype with the ID provided")
+
+                return await mediatype.from_domain()
+
         except Exception as e:
             print(f"Error in get_media_type_id: {e}")
             raise e
@@ -60,22 +61,24 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
             async with self.async_session() as session:
                 async with session.begin():
                     session.add_all([
-                        MediaTypeDAO(MediaTypeId=media_type.id, Name=media_type.name)
+                        await MediaTypeDAO.from_dto(media_type)
                     ])
         except Exception as e:
             print(f"Error in add_media_type: {e}")
             raise e
 
-    async def delete_media_type(self, media_type: MediaType) -> None:
+    async def delete_media_type(self, id: int) -> None:
         try:
-            if not isinstance(media_type, MediaType): 
-                raise ValueError(f"It doesn´t an objet MediaType")
-            
+
+            if not isinstance(id, int):
+                raise ValueError(f"Parameter ID id not the right type")
+
             async with self.async_session() as session:
+                query = delete(MediaTypeDAO).where(MediaTypeDAO.MediaTypeId == id)
                 async with session.begin():
-                    session.execute(
-                        delete(MediaTypeDAO).where(MediaTypeDAO.MediaTypeId == media_type.id)
-                    )
+
+                    await session.execute(query)
+
         except Exception as e:
             print(f"Error in delete_media_type: {str(e)}")
             raise e
@@ -109,22 +112,21 @@ class MediaTypeRepositoryImpl(MediaTypeRepositories):
 
     async def get_media_type_from_track(self, track_id: int) -> MediaType:
         try:
-            if not isinstance(track_id,int) or not isinstance(track_id,float):
+            if not isinstance(track_id, int):
                 raise ValueError(f"Parameter ID id not the right type")
-            
+
             async with self.async_session() as session:
                 query = (select(MediaTypeDAO)
-                        .join(TrackDAO, TrackDAO.MediaTypeId == MediaTypeDAO.MediaTypeId)
-                        .where(TrackDAO.TrackId == track_id))
-                mediatype = await session.execute(query)  # List[Tuple]
-                
-                if not mediatype | mediatype == []:
-                    raise ValueError(f" I don't know if I found any mediatypes with the ID_Track provided")
-                
-                mediatype: MediaTypeDAO = mediatype.scalars().all()  # MediaTypeDAO
-                result: MediaType = MediaType(mediatype[0].MediaTypeId, mediatype[0].Name)  # List[MediaType]
+                         .join(TrackDAO, TrackDAO.MediaTypeId == MediaTypeDAO.MediaTypeId)
+                         .where(TrackDAO.TrackId == track_id))
 
-                return result
+                mediatype, *_ = (await session.execute(query)).scalars().all()  # List[Tuple]
+
+                if not mediatype:
+                    raise ValueError(f" I don't know if I found any mediatype with the ID_Track provided")
+
+                return await mediatype.from_domain()
+
         except Exception as e:
             print(f"Error in get_media_type_from_track: {e}")
             raise e

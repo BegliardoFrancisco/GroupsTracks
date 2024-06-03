@@ -26,6 +26,11 @@ class InvoiceItemRepositories(ABC):
                                   + f"add_invoice_item is abstract method in {__class__}")
 
     @abstractmethod
+    async def add_invoices_items(self, invoices_items: List[InvoiceItems], invoice_id: int) -> None:
+        raise NotImplementedError(f"Not implemented Error:"
+                                  + f"add_invoices_items is abstract method in {__class__}")
+
+    @abstractmethod
     async def update_invoice_item(self, invoice_item: InvoiceItems, invoice_id: int) -> None:
         raise NotImplementedError(f"Not implemented Error:"
                                   + f"update_invoice_item is abstract method in {__class__}")

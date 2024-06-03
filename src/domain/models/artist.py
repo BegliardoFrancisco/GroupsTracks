@@ -13,9 +13,14 @@ class Artist:
         if isinstance(album, Album):
             self.albums.append(album)
         else:
-            raise TypeError(f"the album argument no is type Album is type {type(album)} class:{__class__} in {__name__} {__file__}")
+            raise TypeError(
+                f"the album argument no is type Album is type {type(album)} class:{__class__} in {__name__} {__file__}")
 
     async def add_albums(self, tracks: List[Album]):
 
         add_track_task = [await self.add_album(track) for track in tracks]
         await asyncio.gather(*add_track_task)
+
+    def __str__(self):
+        return (f'id: {self.id} name: {self.name} '
+                f'albums: {[album.__str__() for album in self.albums]}')

@@ -1,6 +1,4 @@
 import asyncio
-
-from .employed import Employed
 from typing import List
 from .invoice import Invoice
 
@@ -23,6 +21,25 @@ class Customer:
         self.fax: str = fax
         self.email: str = email
         self.invoices: List[Invoice] = invoices if invoices is not None else []
+
+    def __str__(self):
+        string = ('{'  
+                        f' id: {self.id},\n'
+                        f' lastname: {self.lastName},\n'
+                        f' firstname: {self.firstName},\n'
+                        f' email: {self.email},\n'
+                        f' invoices: \n'
+                  )
+
+        cant_invoice = len(self.invoices) - 1
+        count: int = 0
+        while count <= cant_invoice:
+            if count == cant_invoice:
+                string += f' {self.invoices[count]},\n' + '}\n'
+
+            string += f'  {self.invoices[count]},\n'
+            count += 1
+        return string + '\n}'
 
     async def add_invoice(self, invoice: Invoice):
         if isinstance(invoice, Invoice):

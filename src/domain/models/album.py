@@ -20,4 +20,7 @@ class Album:
     async def add_tracks(self, tracks: List[Track]):
 
         add_track_task = [await self.add_track(track) for track in tracks]
-        await asyncio.gather(** add_track_task)
+        await asyncio.gather(*add_track_task)
+
+    def __str__(self):
+        return f'id: {self.id} title: {self.title}'

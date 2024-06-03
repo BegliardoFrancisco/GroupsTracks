@@ -21,7 +21,7 @@ class MediaTypeRepositories(ABC):
                                   f"add_media_type no implemented method in class: {__class__}")
 
     @abstractmethod
-    async def delete_media_type(cls, media_type: MediaType) -> None:
+    async def delete_media_type(cls, id: int) -> None:
         raise NotImplementedError('NotImplementedError: '
                                   f'delete_media_type method in {__class__}')
 

@@ -16,7 +16,7 @@ class EmployedRepositories(ABC):
                                   + f"get_employed_by_id is abstract method in {__class__}")
 
     @abstractmethod
-    async def add_employed(self, employed: Employed, leader_id: int) -> None:
+    async def add_employed(self, employed: Employed) -> None:
         raise NotImplementedError(f"Not implemented Error:"
                                   + f"add_employed is abstract method in {__class__}")
 
