@@ -10,9 +10,17 @@ class ArtistResponses(BaseModel):
     albums: List[AlbumResponses]
 
 
+class SimpleArtistResponses(BaseModel):
+    id: int
+    name: str
+
+
 class ConverterArtist:
     @staticmethod
-    async def to_response(artist: Artist) -> ArtistResponses:
+    async def to_response(artist: Artist) -> 'ArtistResponses':
+
+        if not artist.albums:
+            albums_response = []
         albums_response: List[AlbumResponses] = [
             await ConverterAlbum.to_response(album)
             for album in artist.albums
@@ -21,4 +29,11 @@ class ConverterArtist:
             id=artist.id,
             name=artist.name,
             albums=albums_response
+        )
+
+    @staticmethod
+    async def to_simple_response(artist: Artist) -> 'SimpleArtistResponses':
+        return SimpleArtistResponses(
+            id=artist.id,
+            name=artist.name,
         )

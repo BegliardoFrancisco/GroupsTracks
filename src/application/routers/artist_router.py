@@ -1,69 +1,69 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse
-from typing import List
-from src.application.responses.artist_responses import ArtistResponses
-from src.domain.services.artist_service import ArtistService
+from fastapi import HTTPException, status, APIRouter
 from src.application.requests.artist_request import ArtistRequest
+from src.infraestructure.repositories.artist_repository_impl import ArtistRepositoryImpl
+from src.infraestructure.services.artist_service_impl import ArtistServiceImpl
+
+artist_repo = ArtistRepositoryImpl()
+
+artist_service = ArtistServiceImpl(artist_repo)
 
 router_artist = APIRouter(prefix='/artist/v1')
 
 
-@router_artist.get("/")
-async def get_all(artist_service: ArtistService = Depends()) -> List[ArtistResponses] | HTTPException:
+@router_artist.get('/')
+async def get_all():
     try:
         artists = await artist_service.get_all_artist()
         return artists
     except Exception as e:
-        return HTTPException(status_code=500,
-                             detail=f'Internal Server Error in Resquest {e}')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f'Internal Server Error in Resquest {e}')
 
 
 @router_artist.get('/{artist_id}')
-async def get_by_id(artist_id: int, artist_service: ArtistService = Depends()) -> ArtistResponses | HTTPException:
+async def get_by_id(artist_id: int):
     try:
-        artist = await artist_service.get_artist_id(artist_id)
-        return artist
+        response = await artist_service.get_artist_id(artist_id)
+        return response
     except Exception as e:
-        return HTTPException(status_code=400,
-                             detail=f'ID Artist is not find {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f'ID Artist is not find {e}')
 
 
-@router_artist.post('/')
-async def add_artist(artist: ArtistRequest, artist_service: ArtistService = Depends()) -> HTTPException | JSONResponse:
+@router_artist.post('/', status_code=status.HTTP_201_CREATED)
+async def add_artist(artist: ArtistRequest):
     try:
         if artist.name == '':
-            return HTTPException(status_code=400,
-                                 detail="The artist's name must not be empty.")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="The artist's name must not be empty.")
         else:
             await artist_service.add_artist(artist)
-            return JSONResponse(status_code=200, content={'mensaje': 'artist create'})
+            return {'mensaje': 'artist create'}
     except Exception as e:
-        return HTTPException(status_code=500, detail=f'{e}')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
 
 @router_artist.delete('/{artist_id}')
-async def del_artist(artist_id: int, artist_service: ArtistService = Depends()) -> HTTPException | JSONResponse:
+async def del_artist(artist_id: int):
     try:
         await artist_service.delete_artist(artist_id)
+        return {'mensaje': f'artist {artist_id} delete'}
     except Exception as e:
-        return HTTPException(status_code=400, detail=f'{e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
 
 
 @router_artist.put('/')
-async def update_artist(artist: ArtistRequest, artist_service: ArtistService = Depends()
-                        ) -> HTTPException | JSONResponse:
+async def update_artist(artist: ArtistRequest):
     try:
         if not artist.id:
-            return HTTPException(status_code=400,
-                                 detail='The artist ID has not been specified for the update.')
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail='The artist ID has not been specified for the update.')
 
         else:
             await artist_service.update_artist(artist)
-            return JSONResponse(status_code=200,
-                                content={'mensaje': 'Update is complete'}
-                                )
+            return {'mensaje': 'Update is complete'}
 
     except Exception as e:
-        return HTTPException(status_code=500,
-                             detail=f'{e}'
-                             )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f'{e}'
+                            )
