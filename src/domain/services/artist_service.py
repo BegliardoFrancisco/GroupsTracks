@@ -1,5 +1,5 @@
 from typing import List
-from src.application.requests.artist_request import ArtistRequest
+from src.application.requests.artist_request import NewArtistRequest, ArtistRequestUpdate
 from src.domain.repositories.artist_repository import ArtistRepositories
 from src.application.responses.artist_responses import ArtistResponses
 from abc import ABC, abstractmethod
@@ -20,11 +20,11 @@ class ArtistService(ABC):
         raise NotImplementedError('not implemented method get_artist_id from ArtistService')
 
     @abstractmethod
-    async def add_artist(self, artist: ArtistRequest):
+    async def add_artist(self, artist: NewArtistRequest):
         raise NotImplementedError('not implemented method get_artist_id from ArtistService')
 
     @abstractmethod
-    async def update_artist(self, artist: ArtistRequest):
+    async def update_artist(self, artist: ArtistRequestUpdate):
         raise NotImplementedError('not implemented method update_artist from ArtistService')
 
     @abstractmethod

@@ -1,4 +1,8 @@
 import asyncio
+from datetime import datetime
+
+from sqlalchemy.exc import IntegrityError
+
 from src.domain.models.artist import Artist
 from src.domain.repositories.artist_repository import ArtistRepositories
 from src.infraestructure.entities.artistDAO import ArtistDAO
@@ -64,8 +68,11 @@ class ArtistRepositoryImpl(ArtistRepositories):
                     session.add_all([
                         await ArtistDAO.from_dto(artist)
                     ])
+        except IntegrityError as id_error:
+            print(f'{datetime.now()} {id_error}')
+            raise ValueError('The Artist ID already exists')
         except Exception as e:
-            print(f"Error in add_artist: {e}")
+            print(f'{e}')
             raise e
 
     async def delete_artist(self, artist_id: int) -> None:
